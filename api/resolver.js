@@ -16,8 +16,8 @@
     try {
       track = tracks.getById(term);
     } catch (e) {
-      // TODO: gracefully handle errors
-      res.status(500).send('Error getting song');
+      // Let the caller handle the error
+      res.status(e.status).send(e.message);
       return;
     }
 

@@ -4,6 +4,16 @@
   var sync = require('synchronize'),
       request = require('request');
 
+  function getErrorFromResponse(response) {
+    if (!response || !response.body || !response.body.error) {
+      return {
+        status: 500,
+        message: 'An error occurred'
+      };
+    }
+    return response.body.error;
+  }
+
   module.exports = {
     // Returns an array of Spotify track results for the query.
     // Throws if request fails or returns invalid data.
@@ -20,11 +30,12 @@
         timeout: 10 * 1000
       }, sync.defer()));
 
-      if (response.statusCode !== 200 ||
+      if (!response ||
+        response.statusCode !== 200 ||
         !response.body ||
         !response.body.tracks ||
         !response.body.tracks.items) {
-        throw 'Error getting tracks';
+        throw getErrorFromResponse(response);
       }
 
       return response.body.tracks.items;
@@ -39,9 +50,10 @@
         timeout: 10 * 1000
       }, sync.defer()));
 
-      if (response.statusCode !== 200 ||
+      if (!response ||
+        response.statusCode !== 200 ||
         !response.body) {
-        throw 'Error getting track by id';
+        throw getErrorFromResponse(response);
       }
 
       return response.body;
